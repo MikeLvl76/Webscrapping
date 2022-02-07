@@ -1,7 +1,8 @@
 from random import randint
 from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen
-import os, time
+import os
+import time
 import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -10,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+
 
 class Scrapping:
     """
@@ -36,7 +38,7 @@ class Scrapping:
     open_url(link)
         save link to url attribute, open it and return an _UrlopenRet value
     save_page(reading)
-        open link and parse the page 
+        open link and parse the page
     take_tag(tag, attrs = list or tuple or None)
         find tag and return it, if its an <a> tag href will be returned
     take_tags(tag, attrs = list or tuple or None)
@@ -53,7 +55,7 @@ class Scrapping:
         save data in .csv file
     """
 
-    def __init__(self, selenium = False):
+    def __init__(self, selenium=False):
         self.url = ""
         self.page = None
         self.enable_selenium = selenium
@@ -71,14 +73,14 @@ class Scrapping:
     def save_page(self, reading):
         self.page = soup(reading, 'html.parser')
 
-    def take_tag(self, tag, attrs = list or tuple or None):
+    def take_tag(self, tag, attrs=list or tuple or None):
         res = self.page.find(tag, attrs)
         if tag == "a":
             res = self.page.find(tag, attrs, href=True)
             return res['href']
         return res
 
-    def take_tags(self, tag, attrs = list or tuple or None):
+    def take_tags(self, tag, attrs=list or tuple or None):
         res = self.page.findAll(tag, attrs)
         if tag == "a":
             href = []
@@ -90,7 +92,8 @@ class Scrapping:
 
     def take_specific_subtag(self, parent_tag, child_tag):
         assert parent_tag is not None, "Tag {} not found !".format(parent_tag)
-        assert child_tag is not None, "Error, no child tag called {}.".format(child_tag)
+        assert child_tag is not None, "Error, no child tag called {}.".format(
+            child_tag)
         if isinstance(parent_tag, (list, tuple)):
             tags = []
             for p_tag in parent_tag:
@@ -100,11 +103,13 @@ class Scrapping:
             return parent_tag.find(child_tag, recursive=False)
 
     def tag_text(self, the_tag):
-        assert the_tag is not None, "TypeError: {} is a None type.".format(the_tag)
+        assert the_tag is not None, "TypeError: {} is a None type.".format(
+            the_tag)
         if isinstance(the_tag, (list, tuple)):
             tags = []
             for p_tag in the_tag:
-                tags.append(p_tag.getText().replace("\n", "").replace(r"[(\d)]", ""))
+                tags.append(p_tag.getText().replace(
+                    "\n", "").replace(r"[(\d)]", ""))
             return tags
         else:
             return the_tag.getText().replace("\n", "").replace(r"[(\d)]", "")
@@ -117,7 +122,7 @@ class Scrapping:
             self.store_as_csv(path, *args)
         else:
             raise AttributeError("Invalid extension")
-        
+
     def store_as_txt(self, path, lines):
         with open(path) as save:
             save.write("In URL {}\n".format(self.url))
@@ -131,16 +136,18 @@ class Scrapping:
         df.to_csv(path, index=False, encoding='utf-8')
         print("File saved ! Path: {} !".format(path))
 
-    def load_selenium(self, chromedriver_path, detach = False, headless = False):
+    def load_selenium(self, chromedriver_path, detach=False, headless=False):
         if self.enable_selenium is True:
             self.options = webdriver.ChromeOptions()
-            if detach is True : self.options.add_experimental_option("detach", detach)
-            if headless is True : self.options.add_argument("--headless")
+            if detach is True: self.options.add_experimental_option(
+                "detach", detach)
+            if headless is True: self.options.add_argument("--headless")
             service = Service(chromedriver_path)
-            self.driver = webdriver.Chrome(service=service, options=self.options)
+            self.driver = webdriver.Chrome(
+                service=service, options=self.options)
             self.action = ActionChains(self.driver)
 
-    def change(self, tool = '\0', new_driver = None, new_options = None, new_action = None):
+    def change(self, tool='\0', new_driver=None, new_options=None, new_action=None):
         if(tool == 'driver'):
             if(new_driver is not None):
                 self.driver = new_driver
@@ -171,7 +178,26 @@ class Scrapping:
     def wait(self, duration):
         time.sleep(duration)
 
-    def find(self, driver, method, element, clickable = False, multiple = False):
+    def maximize(self):
+        self.wait(3)
+        self.driver.maximize_window()
+
+    def minimize(self):
+        self.wait(3)
+        self.driver.minimize_window()
+
+    def wait_until(self, driver, duration, method, element):
+        wait = WebDriverWait(driver, duration)
+        response = wait.until(EC.visibility_of_element_located((method, element)))
+        return response
+
+    def async_script(self, driver, script, response = None):
+        driver.execute_async_script(script, response)
+
+    def script(self, driver, script, response = None):
+        driver.execute_script(script, response)
+
+    def find(self, driver, method, element, clickable=False, multiple=False):
         if multiple is True:
             if clickable is True:
                 return driver.find_elements(method, element).click()
@@ -227,40 +253,39 @@ class Scrapping:
             display += f"[INFO] selenium on {self.driver.current_url}"
         return display
 
-
 if __name__ == "__main__":
     web = Scrapping(True)
     path = "C:\Program Files (x86)\Google\Chrome\chromedriver.exe"
-    web.load_selenium(path, detach=True, headless=True)
+    web.load_selenium(path, detach=True, headless=False)
     driver = web.get_driver()
     action = web.get_action()
     web.get(driver, "https://www.youtube.com/")
-    print(f"Going to {driver.current_url}")
+    web.maximize()
     web.wait(3)
     web.find(driver, By.XPATH, '//*[contains(text(), "J\'accepte")]', True)
-    print(f"Element found !")
     web.wait(3)
     web.find_input(action, driver, By.XPATH, '//input[@id="search"]', "diablox9", Keys.RETURN)
-    print(f"Element found !")
     web.wait(3)
     web.find_link(action, driver, By.XPATH, '//a[@id="video-title"]', multiple=True, keys=Keys.SPACE)
-    print(f"Element found !")
-    print(web)
-    web.wait(3)
-    web.open(driver, 'https://www.google.com')
-    web.switch(driver, 1)
-    print(f"Switching to {driver.current_url}")
-    web.wait(3)
-    web.find_input(action, driver, By.TAG_NAME, 'input', "humain" + " wikipedia", Keys.RETURN)
-    print(f"Element found !")
-    web.wait(3)
-    element = web.find(driver, By.CLASS_NAME, 'yuRUbf')
-    web.find_link(action, element, By.TAG_NAME, 'a')
-    print(f"Element found !")
-    print(web)
-    web.wait(3)
-    web.quit(driver)
-    print(f"Window(s) closed")
+    web.wait_until(driver, 5, By.TAG_NAME, 'video')
+    web.script(driver, """
+           let video = document.querySelector('video')
+           video.muted = true
+      """)
+    # web.open(driver, 'https://www.google.com')
+    # web.switch(driver, 1)
+    # print(f"Switching to {driver.current_url}")
+    # web.wait(3)
+    # web.find_input(action, driver, By.TAG_NAME, 'input', "humain" + " wikipedia", Keys.RETURN)
+    # print(f"Element found !")
+    # web.wait(3)
+    # element = web.find(driver, By.CLASS_NAME, 'yuRUbf')
+    # web.find_link(action, element, By.TAG_NAME, 'a')
+    # print(f"Element found !")
+    # print(web)
+    # web.wait(3)
+    # web.quit(driver)
+    # print(f"Window(s) closed")
     # web = Webscrapping()
     # url = web.open_url("https://fr.wikipedia.org/wiki/Jeux_olympiques_d%27%C3%A9t%C3%A9_de_2020")
     # web.save_page(url)
