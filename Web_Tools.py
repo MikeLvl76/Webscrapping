@@ -204,10 +204,10 @@ class Scrapping:
     def script(self, driver, script, response = None):
         driver.execute_script(script, response)
 
-    def find(self, driver, method, element, clickable=False, multiple=False):
+    def find(self, driver, method, element, clickable=False, multiple=False, index = 0):
         if multiple is True:
             if clickable is True:
-                return driver.find_elements(method, element).click()
+                return driver.find_elements(method, element)[index].click()
             else:
                 return driver.find_elements(method, element)
         else:
@@ -273,3 +273,9 @@ if __name__ == "__main__":
     web.find(driver, By.XPATH, '//*[contains(text(), "Se connecter")]', True)
     web.wait(3)
     web.find_input(action, driver, By.TAG_NAME, "input", log, Keys.RETURN)
+    web.wait(3)
+    if(driver.current_url.find("deniedsigninrejected") != -1):
+        driver.back()
+        web.wait(1)
+        button = web.find(driver, By.XPATH, '//*[contains(text(), "Créer un compte")]')
+        web.wait(1)
