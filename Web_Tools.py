@@ -11,6 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
+from file_manager import Manager
 
 
 class Scrapping:
@@ -261,18 +262,14 @@ class Scrapping:
 
 if __name__ == "__main__":
     web = Scrapping(True)
+    manager = Manager(os.getcwd() + os.sep + "login.txt")
+    log = manager.open_and_read(manager.get_file(), "utf-8")
     path = "C:\Program Files (x86)\Google\Chrome\chromedriver.exe"
     web.load_selenium(path, detach=True, headless=False)
     driver = web.get_driver()
     action = web.get_action()
-    web.get(driver, "https://www.youtube.com/")
-    web.maximize()
+    web.get(driver, "https://www.google.com")
     web.wait(3)
-    web.find(driver, By.XPATH, '//*[contains(text(), "J\'accepte")]', True)
+    web.find(driver, By.XPATH, '//*[contains(text(), "Se connecter")]', True)
     web.wait(3)
-    web.find_input(action, driver, By.XPATH, '//input[@id="search"]', "diablox9", Keys.RETURN)
-    web.wait(3)
-    web.find_link(action, driver, By.XPATH, '//a[@id="video-title"]', multiple=True, keys=Keys.SPACE)
-    web.wait_until(driver, 5, By.TAG_NAME, 'video')
-    web.mute(driver)
-    web.quit()
+    web.find_input(action, driver, By.TAG_NAME, "input", log, Keys.RETURN)
