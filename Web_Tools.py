@@ -191,6 +191,12 @@ class Scrapping:
         response = wait.until(EC.visibility_of_element_located((method, element)))
         return response
 
+    def mute(self, driver):
+        self.script(driver, """
+           let video = document.querySelector('video')
+           video.muted = true
+        """)
+
     def async_script(self, driver, script, response = None):
         driver.execute_async_script(script, response)
 
@@ -268,30 +274,5 @@ if __name__ == "__main__":
     web.wait(3)
     web.find_link(action, driver, By.XPATH, '//a[@id="video-title"]', multiple=True, keys=Keys.SPACE)
     web.wait_until(driver, 5, By.TAG_NAME, 'video')
-    web.script(driver, """
-           let video = document.querySelector('video')
-           video.muted = true
-      """)
-    # web.open(driver, 'https://www.google.com')
-    # web.switch(driver, 1)
-    # print(f"Switching to {driver.current_url}")
-    # web.wait(3)
-    # web.find_input(action, driver, By.TAG_NAME, 'input', "humain" + " wikipedia", Keys.RETURN)
-    # print(f"Element found !")
-    # web.wait(3)
-    # element = web.find(driver, By.CLASS_NAME, 'yuRUbf')
-    # web.find_link(action, element, By.TAG_NAME, 'a')
-    # print(f"Element found !")
-    # print(web)
-    # web.wait(3)
-    # web.quit(driver)
-    # print(f"Window(s) closed")
-    # web = Webscrapping()
-    # url = web.open_url("https://fr.wikipedia.org/wiki/Jeux_olympiques_d%27%C3%A9t%C3%A9_de_2020")
-    # web.save_page(url)
-    # tags = web.take_tags("table", {'class': 'wikitable'})
-    # subtags = web.take_specific_subtag(tags, "caption")
-    # #   print(web.tag_text(subtags))
-    # #   web.store_as("test", ".csv", ["Légende"], web.tag_text(subtags))
-    # links = web.take_tags("a", {})
-    # for l in links: print(l)
+    web.mute(driver)
+    web.quit()
