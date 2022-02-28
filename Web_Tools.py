@@ -207,12 +207,14 @@ class Scrapping:
     def find(self, driver, method, element, clickable=False, multiple=False, index = 0):
         if multiple is True:
             if clickable is True:
-                return driver.find_elements(method, element)[index].click()
+                driver.find_elements(method, element)[index].click()
+                return driver
             else:
                 return driver.find_elements(method, element)
         else:
             if clickable is True:
-                return driver.find_element(method, element).click()
+                driver.find_element(method, element).click()
+                return driver
             else:
                 return driver.find_element(method, element)
 
@@ -252,12 +254,12 @@ class Scrapping:
 
     def __str__(self):
         display = "--- Status ---\n"
-        if not self.url: display += "[INFO] no url found\n"
+        if not self.url: display += "[INFO] no url found with urlopen\n"
         else: display += "[INFO] url = {}\n".format(self.url)
         if self.enable_selenium is False:
             display += "[INFO] selenium not used"
         else:
-            display += f"[INFO] selenium on {self.driver.current_url}"
+            display += f"[INFO] url found by Selenium : {self.driver.current_url}"
         return display
 
 if __name__ == "__main__":
@@ -272,10 +274,11 @@ if __name__ == "__main__":
     web.wait(3)
     web.find(driver, By.XPATH, '//*[contains(text(), "Se connecter")]', True)
     web.wait(3)
-    web.find_input(action, driver, By.TAG_NAME, "input", log, Keys.RETURN)
+    login = web.find(driver, By.XPATH, '//*[contains(text(), "Créer un compte")]', True)
     web.wait(3)
-    if(driver.current_url.find("deniedsigninrejected") != -1):
-        driver.back()
-        web.wait(1)
-        button = web.find(driver, By.XPATH, '//*[contains(text(), "Créer un compte")]')
-        web.wait(1)
+    web.find(login, By.TAG_NAME, 'li', True)
+    web.wait(3)
+    print(web)
+    form = web.find(login, By.TAG_NAME, 'form')
+    web.wait(3)
+    web.find_input(action, form, By.NAME, 'firstName', 'test', Keys.RETURN)
