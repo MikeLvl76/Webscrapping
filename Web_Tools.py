@@ -264,8 +264,8 @@ class Scrapping:
 
 if __name__ == "__main__":
     web = Scrapping(True)
-    manager = Manager(os.getcwd() + os.sep + "login.txt")
-    log = manager.open_and_read(manager.get_file(), "utf-8")
+    manager = Manager(os.getcwd() + os.sep + "login.txt", 'utf-8')
+    log = manager.read_attributes()
     path = "C:\Program Files (x86)\Google\Chrome\chromedriver.exe"
     web.load_selenium(path, detach=True, headless=False)
     driver = web.get_driver()
@@ -281,4 +281,18 @@ if __name__ == "__main__":
     print(web)
     form = web.find(login, By.TAG_NAME, 'form')
     web.wait(3)
-    web.find_input(action, form, By.NAME, 'firstName', 'test', Keys.RETURN)
+    name = log[0]
+    last = log[1]
+    mail = log[2]
+    pwd = log[3]
+    web.find_input(action, form, By.NAME, 'firstName', name, Keys.ENTER)
+    web.wait(3)
+    web.find_input(action, form, By.NAME, 'lastName', last, Keys.ENTER)
+    web.wait(3)
+    web.find_input(action, form, By.NAME, 'Username', mail, Keys.ENTER)
+    web.wait(3)
+    web.find_input(action, form, By.NAME, 'Passwd', pwd, Keys.ENTER)
+    web.wait(3)
+    web.find_input(action, form, By.NAME, 'ConfirmPasswd', pwd, Keys.ENTER)
+    web.wait(3)
+    web.find(driver, By.XPATH, '//*[contains(text(), "Suivant")]', True)
