@@ -180,11 +180,9 @@ class Scrapping:
         time.sleep(duration)
 
     def maximize(self):
-        self.wait(3)
         self.driver.maximize_window()
 
     def minimize(self):
-        self.wait(3)
         self.driver.minimize_window()
 
     def wait_until(self, driver, duration, method, element):
@@ -263,6 +261,7 @@ class Scrapping:
         return display
 
 if __name__ == "__main__":
+    duration = 2
     web = Scrapping(True)
     manager = Manager(os.getcwd() + os.sep + "login.txt", 'utf-8')
     log = manager.read_attributes()
@@ -271,28 +270,31 @@ if __name__ == "__main__":
     driver = web.get_driver()
     action = web.get_action()
     web.get(driver, "https://www.google.com")
-    web.wait(3)
+    web.wait(duration)
     web.find(driver, By.XPATH, '//*[contains(text(), "Se connecter")]', True)
-    web.wait(3)
+    web.wait(duration)
     login = web.find(driver, By.XPATH, '//*[contains(text(), "Créer un compte")]', True)
-    web.wait(3)
+    web.wait(duration)
     web.find(login, By.TAG_NAME, 'li', True)
-    web.wait(3)
+    web.wait(duration)
     print(web)
     form = web.find(login, By.TAG_NAME, 'form')
-    web.wait(3)
-    name = log[0]
-    last = log[1]
-    mail = log[2]
-    pwd = log[3]
-    web.find_input(action, form, By.NAME, 'firstName', name, Keys.ENTER)
-    web.wait(3)
-    web.find_input(action, form, By.NAME, 'lastName', last, Keys.ENTER)
-    web.wait(3)
-    web.find_input(action, form, By.NAME, 'Username', mail, Keys.ENTER)
-    web.wait(3)
-    web.find_input(action, form, By.NAME, 'Passwd', pwd, Keys.ENTER)
-    web.wait(3)
-    web.find_input(action, form, By.NAME, 'ConfirmPasswd', pwd, Keys.ENTER)
-    web.wait(3)
+    web.wait(duration)
+    name = log['firstname']
+    last = log['lastname']
+    mail = log['email']
+    pwd = log['pwd']
+    web.find_input(action, form, By.NAME, 'firstName', name, Keys.RETURN)
+    web.wait(duration)
+    web.find_input(action, form, By.NAME, 'lastName', last, Keys.RETURN)
+    web.wait(duration)
+    web.find_input(action, form, By.NAME, 'Username', mail, Keys.RETURN)
+    web.wait(duration)
+    web.find_input(action, form, By.NAME, 'Passwd', pwd, Keys.RETURN)
+    web.wait(duration)
+    web.find_input(action, form, By.NAME, 'ConfirmPasswd', pwd, Keys.RETURN)
+    web.wait(duration)
     web.find(driver, By.XPATH, '//*[contains(text(), "Suivant")]', True)
+    web.wait(duration)
+    if web.find(driver, By.CLASS_NAME, "o6cuMc").text is not None:
+        print(web.find(driver, By.CLASS_NAME, "o6cuMc").text)
