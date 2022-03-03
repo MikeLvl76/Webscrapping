@@ -1,50 +1,36 @@
 import os
+import polars as pl
 
 class Manager:
 
     def __init__(self, filepath, encoding) -> None:
+        assert filepath.find(".csv") != -1, "not a csv file"
         self.file = filepath
         self.encoding = encoding
+        self.df = pl.read_csv(self.file, sep=';',
+                         ignore_errors=True, low_memory=True)
 
-    def get_file(self):
-        return self.file
+    def get_file(self) -> str:
+        return self.file  
 
-    # open and write in file (empty or not), enter a key and its value
-    def write_attributes(self, key, value):
-        lines = self.read_attributes()
-        if len(lines) == 0:
-            with open(self.file, 'w', encoding=self.encoding) as writer:
-                writer.write(key + "=" + value)
-        else:
-            with open(self.file, 'a', encoding=self.encoding) as writer:
-                writer.write("\n" + key + "=" + value)
+    # open csv file and retrieve columns
+    def get_collist(self):
+        return self.df.columns
 
-    # open and write in file : select keys to remove, removed keys are replaced by empty char
-    def remove_attributes(self, *keys):
-        lines = self.read_attributes()
-        if len(lines) > 0:
-            with open(self.file, 'r+', encoding=self.encoding) as remover:
-                for key in keys:
-                    remover.seek(len(key) + 1, 0)
-                
-                print("SEEK\n" + remover.readline())
-    
-    # open and read file, return text as array of lines
-    def open_and_read(self):
-        with open(self.file, 'r', encoding=self.encoding) as reader:
-            return reader.readlines()
+    # open csv file and read given column name
+    def read_cols(self, *args) -> list:
+        args_read = []
+        for arg in args:
+            args_read = self.df[arg]
+        return args_read
 
-    # read file split text on "=" symbol, return parts as a dict
-    def read_attributes(self):
-        dict = {}
-        text = self.open_and_read()
-        for t in text:
-            key = t.split('=')[0]
-            dict[key] = t.split('=')[1].replace("\n", "")
-        return dict
+    # open csv file and add column
+    def add_cols(self, **args):
+        if len(args) == 0: exit(0)
+        for key in args:
+            self.df[key] = args.get(key)
 
 if __name__ == "__main__":
-    m = Manager(os.getcwd() + os.sep + "login.txt", 'utf-8')
-    keys = m.read_attributes()
-    print(keys)
-    m.remove_attributes(list(keys)[0])
+    m = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
+    m.add_cols(**{"test" : 45435, "znfiesifviev" : 74535})
+    print(m.read_cols(m.get_collist()))
