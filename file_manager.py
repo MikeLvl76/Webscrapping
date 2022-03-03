@@ -1,6 +1,9 @@
 from msilib.schema import Error
 import os
 import polars as pl
+import sys
+
+sys.tracebacklimit=0
 
 class ManagerException(Exception):
     def __init__(self, msg) -> None:
@@ -34,14 +37,21 @@ class Manager:
         if len(cols) == 0: exit(0)
         names = self.read_cols(self.get_col_list())
         for key in cols:
-            if key in names: raise ManagerException("column already inserted")
+            if key in names: raise ManagerException(f'column "{key}" already inserted')
             self.df[key] = [cols.get(key)]
         self.df.to_csv(self.file, sep=";")
 
-    def remove_cols(self, *cols) -> None:
+    def remove_cols(self, cols = list) -> None:
+        if len(cols) == 0: exit(0)
+        names = self.read_cols(self.get_col_list())
+        for col in cols:
+            if col not in names: raise ManagerException(f'column "{col}" cannot be deleted')
         self.df = self.df.drop(cols)
+        self.df.to_csv(self.file, sep=";")
 
 if __name__ == "__main__":
     m = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
-    m.add_cols(**{"test" : 45435, "znfiesifviev" : 74535})
+    print(m.read_cols(m.get_col_list()))
+    removal = ["test", "znfiesifviev"]
+    m.remove_cols(removal)
     print(m.read_cols(m.get_col_list()))
