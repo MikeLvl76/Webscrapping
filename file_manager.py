@@ -14,7 +14,7 @@ class Manager:
         return self.file  
 
     # open csv file and retrieve columns
-    def get_collist(self):
+    def get_col_list(self):
         return self.df.columns
 
     # open csv file and read given column name
@@ -28,9 +28,10 @@ class Manager:
     def add_cols(self, **args):
         if len(args) == 0: exit(0)
         for key in args:
-            self.df[key] = args.get(key)
+            self.df[key] = [args.get(key)]
+        self.df.to_csv(self.file, sep=";")
 
 if __name__ == "__main__":
     m = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
     m.add_cols(**{"test" : 45435, "znfiesifviev" : 74535})
-    print(m.read_cols(m.get_collist()))
+    print(m.read_cols(m.get_col_list()))
