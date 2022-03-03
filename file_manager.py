@@ -5,6 +5,8 @@ import sys
 
 sys.tracebacklimit=0
 
+PATH = os.getcwd() + os.sep
+
 class ManagerException(Exception):
     def __init__(self, msg) -> None:
         super().__init__("Exception during process: " + msg)
@@ -50,7 +52,7 @@ class Manager:
         self.df.to_csv(self.file, sep=";")
 
 if __name__ == "__main__":
-    m = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
+    m = Manager(PATH + "login.csv", 'utf-8')
     print(m.read_cols(m.get_col_list()))
     removal = ["test", "znfiesifviev"]
     m.remove_cols(removal)
