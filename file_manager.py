@@ -1,4 +1,3 @@
-from msilib.schema import Error
 import os
 import polars as pl
 import sys
@@ -28,24 +27,25 @@ class Manager:
         return self.df.columns
 
     # open csv file and read given column name
-    def read_cols(self, *cols) -> list[str]:
+    def read_cols(self, *cols) -> list:
         cols_read = []
         for arg in cols:
             cols_read = self.df[arg]
-        return cols_read[0].columns
+        return cols_read
 
     # open csv file and add column
     def add_cols(self, **cols) -> None:
         if len(cols) == 0: exit(0)
-        names = self.read_cols(self.get_col_list())
+        names = self.read_cols(self.get_col_list())[0].columns
         for key in cols:
             if key in names: raise ManagerException(f'column "{key}" already inserted')
             self.df[key] = [cols.get(key)]
         self.df.to_csv(self.file, sep=";")
 
+    # remove cols by name
     def remove_cols(self, cols = list) -> None:
         if len(cols) == 0: exit(0)
-        names = self.read_cols(self.get_col_list())
+        names = self.read_cols(self.get_col_list())[0].columns
         for col in cols:
             if col not in names: raise ManagerException(f'column "{col}" cannot be deleted')
         self.df = self.df.drop(cols)
@@ -53,7 +53,4 @@ class Manager:
 
 if __name__ == "__main__":
     m = Manager(PATH + "login.csv", 'utf-8')
-    print(m.read_cols(m.get_col_list()))
-    removal = ["test", "znfiesifviev"]
-    m.remove_cols(removal)
     print(m.read_cols(m.get_col_list()))
