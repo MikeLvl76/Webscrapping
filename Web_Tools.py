@@ -263,8 +263,8 @@ class Scrapping:
 if __name__ == "__main__":
     duration = 2
     web = Scrapping(True)
-    manager = Manager(os.getcwd() + os.sep + "login.txt", 'utf-8')
-    log = manager.read_attributes()
+    manager = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
+    log = manager.read_cols(manager.get_col_list())
     path = "C:\Program Files (x86)\Google\Chrome\chromedriver.exe"
     web.load_selenium(path, detach=True, headless=False)
     driver = web.get_driver()
@@ -280,10 +280,10 @@ if __name__ == "__main__":
     print(web)
     form = web.find(login, By.TAG_NAME, 'form')
     web.wait(duration)
-    name = log['firstname']
-    last = log['lastname']
-    mail = log['email']
-    pwd = log['pwd']
+    name = log['firstname'][0]
+    last = log['lastname'][0]
+    mail = log['email'][0]
+    pwd = log['pwd'][0]
     web.find_input(action, form, By.NAME, 'firstName', name, Keys.RETURN)
     web.wait(duration)
     web.find_input(action, form, By.NAME, 'lastName', last, Keys.RETURN)
