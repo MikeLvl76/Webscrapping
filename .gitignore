@@ -1,2 +1,5 @@
+# draft code
 *.txt
-*.csv
+
+# python cache
+__pycache__

@@ -11,7 +11,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-from file_manager import Manager
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 class Scrapping:
@@ -26,7 +26,7 @@ class Scrapping:
     page : None | soup
         current page visited
     enable_selenium : bool
-        say whether or not selenium is enabled
+        say whether selenium is enabled or not
     options : None | ChromeOptions
         options from webdriver
     driver : None | WebDriver
@@ -115,35 +115,14 @@ class Scrapping:
         else:
             return the_tag.getText().replace("\n", "").replace(r"[(\d)]", "")
 
-    def store_as(self, filename, extension, *args):
-        path = os.getcwd() + os.sep + filename + extension
-        if extension == ".txt":
-            self.store_as_txt(path, *args)
-        elif extension == ".csv":
-            self.store_as_csv(path, *args)
-        else:
-            raise AttributeError("Invalid extension")
-
-    def store_as_txt(self, path, lines):
-        with open(path) as save:
-            save.write("In URL {}\n".format(self.url))
-            save.write(lines)
-            print("File saved ! Path: {} !".format(path))
-
-    def store_as_csv(self, path, columns, values):
-        df = pd.DataFrame()     # {'column name': list}
-        for i in range(len(columns)):
-            df.insert(i, columns[i], values)
-        df.to_csv(path, index=False, encoding='utf-8')
-        print("File saved ! Path: {} !".format(path))
-
-    def load_selenium(self, chromedriver_path, detach=False, headless=False):
+    def load_selenium(self, detach=False, headless=False):
         if self.enable_selenium is True:
             self.options = webdriver.ChromeOptions()
             if detach is True: self.options.add_experimental_option(
                 "detach", detach)
             if headless is True: self.options.add_argument("--headless")
-            service = Service(chromedriver_path)
+            # take browser driver version matching current browser version
+            service = Service(ChromeDriverManager().install())
             self.driver = webdriver.Chrome(
                 service=service, options=self.options)
             self.action = ActionChains(self.driver)
@@ -259,42 +238,3 @@ class Scrapping:
         else:
             display += f"[INFO] url found by Selenium : {self.driver.current_url}"
         return display
-
-if __name__ == "__main__":
-    duration = 2
-    web = Scrapping(True)
-    manager = Manager(os.getcwd() + os.sep + "login.csv", 'utf-8')
-    log = manager.read_cols(manager.get_col_list())
-    path = "C:\Program Files (x86)\Google\Chrome\chromedriver.exe"
-    web.load_selenium(path, detach=True, headless=False)
-    driver = web.get_driver()
-    action = web.get_action()
-    web.get(driver, "https://www.google.com")
-    web.wait(duration)
-    web.find(driver, By.XPATH, '//*[contains(text(), "Se connecter")]', True)
-    web.wait(duration)
-    login = web.find(driver, By.XPATH, '//*[contains(text(), "Créer un compte")]', True)
-    web.wait(duration)
-    web.find(login, By.TAG_NAME, 'li', True)
-    web.wait(duration)
-    print(web)
-    form = web.find(login, By.TAG_NAME, 'form')
-    web.wait(duration)
-    name = log['firstname'][0]
-    last = log['lastname'][0]
-    mail = log['email'][0]
-    pwd = log['pwd'][0]
-    web.find_input(action, form, By.NAME, 'firstName', name, Keys.RETURN)
-    web.wait(duration)
-    web.find_input(action, form, By.NAME, 'lastName', last, Keys.RETURN)
-    web.wait(duration)
-    web.find_input(action, form, By.NAME, 'Username', mail, Keys.RETURN)
-    web.wait(duration)
-    web.find_input(action, form, By.NAME, 'Passwd', pwd, Keys.RETURN)
-    web.wait(duration)
-    web.find_input(action, form, By.NAME, 'ConfirmPasswd', pwd, Keys.RETURN)
-    web.wait(duration)
-    web.find(driver, By.XPATH, '//*[contains(text(), "Suivant")]', True)
-    web.wait(duration)
-    if web.find(driver, By.CLASS_NAME, "o6cuMc").text is not None:
-        print(web.find(driver, By.CLASS_NAME, "o6cuMc").text)
