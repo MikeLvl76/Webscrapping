@@ -46,6 +46,8 @@ class Scrapping:
         same as take_tag but with multiple tags
     take_specific_subtag(parent_tag, child_tag)
         find child tag with given parent tag, both must exist
+    take_specific_subtags(parent_tag, child_tag)
+        same as above but find all children from parent tag
     take_text(the_tag)
         return text inside tag
     store_as(filename, extension, *args)
@@ -102,6 +104,18 @@ class Scrapping:
             return tags
         else:
             return parent_tag.find(child_tag, recursive=False)
+
+    def take_specific_subtags(self, parent_tag, child_tag):
+        assert parent_tag is not None, "Tag {} not found !".format(parent_tag)
+        assert child_tag is not None, "Error, no child tag called {}.".format(
+            child_tag)
+        if isinstance(parent_tag, (list, tuple)):
+            tags = []
+            for p_tag in parent_tag:
+                tags.append(p_tag.findAll(child_tag, recursive=False))
+            return tags
+        else:
+            return parent_tag.findAll(child_tag, recursive=False)
 
     def tag_text(self, the_tag):
         assert the_tag is not None, "TypeError: {} is a None type.".format(

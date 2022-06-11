@@ -22,10 +22,10 @@ class File_Manager:
         self.dir_exists = exists(dirname)
 
     def create_file(self, dirname, file, extension, content):
-        if self.dir_exists:
+        if not self.dir_exists:
             mkdir(dirname)
             self.dir_exists = True
-        self.file_path = f"../{dirname} + {sep} + {file}.{extension}"
+        self.file_path = "{}{}{}.{}".format(dirname, sep, file, extension)
         with open(self.file_path, 'w', encoding="utf-8") as writer:
             writer.write(content)
 
