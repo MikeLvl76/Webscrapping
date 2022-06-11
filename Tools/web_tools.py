@@ -118,8 +118,7 @@ class Scrapping:
             return parent_tag.findAll(child_tag, recursive=False)
 
     def tag_text(self, the_tag):
-        assert the_tag is not None, "TypeError: {} is a None type.".format(
-            the_tag)
+        assert the_tag is not None, "TypeError: tag is a None type."
         if isinstance(the_tag, (list, tuple)):
             tags = []
             for p_tag in the_tag:
@@ -128,6 +127,22 @@ class Scrapping:
             return tags
         else:
             return the_tag.getText().replace("\n", "").replace(r"[(\d)]", "")
+
+    def get_one(self, tag, by_index = None, by_string = None, by_number = None):
+        assert tag is not None, "TypeError: tag is a None type."
+        assert isinstance(tag, (list, tuple)), "tag must be a list or tuple"
+        if by_index is not None:
+            if by_index >= 0 or by_index <= len(tag):
+                return tag[by_index]
+        if by_string is not None:
+            for elt in tag:
+                if self.tag_text(elt).find(by_string) != -1:
+                    return elt
+        if by_number is not None:
+            for elt in tag:
+                if float(self.tag_text(elt)) == by_number:
+                    return elt
+        return None
 
     def load_selenium(self, detach=False, headless=False):
         if self.enable_selenium is True:

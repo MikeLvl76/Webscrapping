@@ -13,6 +13,7 @@ class File_Manager:
 
     def __init__(self) -> None:
         self.file_path = ''
+
     def get_file_path(self):
         return self.file_path
 
