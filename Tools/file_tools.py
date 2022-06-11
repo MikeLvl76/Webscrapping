@@ -13,23 +13,18 @@ class File_Manager:
 
     def __init__(self) -> None:
         self.file_path = ''
-        self.dir_exists = False
-
     def get_file_path(self):
         return self.file_path
 
-    def has_dir(self, dirname):
-        self.dir_exists = exists(dirname)
-
     def create_file(self, dirname, file, extension, content):
-        if not self.dir_exists:
+        if not exists(dirname):
             mkdir(dirname)
-            self.dir_exists = True
         self.file_path = "{}{}{}.{}".format(dirname, sep, file, extension)
         with open(self.file_path, 'w', encoding="utf-8") as writer:
             writer.write(content)
+        print(f"File created at path : {self.file_path}")
 
-    def append_file(self, filepath, content = None):
+    def append_file(self, filepath, content = "<default_append>"):
         if not filepath:
             raise FileException('wrong path given')
         
@@ -37,10 +32,12 @@ class File_Manager:
             if content is None:
                 raise ValueError('no content to add in file')
             editor.write(content)
+        print(f"File appended at path : {self.file_path}")
 
     def read_file(self, filepath):
         if not filepath:
             raise FileException('wrong path given')
 
+        print(f"Reading file at path : {self.file_path}...")
         with open(filepath, 'r') as reader:
             return reader.readlines()

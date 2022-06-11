@@ -2,6 +2,7 @@ from Tools.web_tools import Scrapping
 from Tools.file_tools import File_Manager
 import re
 
+# test with french presidential elections
 def main():
     scrapping = Scrapping()
     manager = File_Manager()
@@ -12,14 +13,12 @@ def main():
     lines = scrapping.take_specific_subtags(body, 'tr')
     names = scrapping.take_specific_subtag(lines[1:len(lines)], 'td')
     text = scrapping.tag_text(names)
-    text_formatted = [re.sub(r"\(([^()]+)\)", "\t", item) for item in text]
-    cols = [item.split('\t')[:-1] for item in text_formatted]
+    text_formatted = [re.sub(r"\(([^()]+)\)", ",", item) for item in text]
+    cols = [item.split(',')[:-1] for item in text_formatted]
     content = ''
     for col in cols:
-        content += col[0] + '\t' + col[1] + '\n'
-    manager.has_dir('results')
+        content += col[0] + ',' + col[1] + '\n'
     manager.create_file('results', 'election', 'csv', content)
-    print(manager.read_file(manager.get_file_path()))
     return
 
 if __name__ == '__main__':
