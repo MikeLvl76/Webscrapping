@@ -32,6 +32,7 @@ def main():
             header.append(f"{scrapping.tag_text(col).lower()} (pourcentage)")
         else:
             header.append(scrapping.tag_text(col).lower())
+            
     # get necessary rows : just candidates
     # data is formatted for better use
     rows = scrapping.take_specific_subtags(trs[2:14], 'td')

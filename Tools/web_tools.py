@@ -197,12 +197,6 @@ class Scrapping:
         response = wait.until(EC.visibility_of_element_located((method, element)))
         return response
 
-    def mute(self, driver):
-        self.script(driver, """
-           let video = document.querySelector('video')
-           video.muted = true
-        """)
-
     def async_script(self, driver, script, response = None):
         driver.execute_async_script(script, response)
 
