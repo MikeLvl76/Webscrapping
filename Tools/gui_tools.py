@@ -1,4 +1,4 @@
-from tkinter import Canvas, Entry, Tk
+from tkinter import Button, Canvas, Entry, Tk
 import tkinter
 
 class Tools:
@@ -35,6 +35,11 @@ class Tools:
         entry.pack()
         return entry
 
+    def add_button(self, master, text, command, **args):
+        button = Button(master, text=text, command=command, **args)
+        button.pack()
+        return button
+
     def place_items(self, items, x_serie, y_serie, w_serie, h_serie):
         for item, x, y, w, h in zip(items, x_serie, y_serie, w_serie, h_serie):
             item.place(x=x, y=y, width=w, height=h)
@@ -47,5 +52,8 @@ tools.create_window('Test')
 canvas = tools.create_canvas(tools.root, (), background='red')
 var = tkinter.StringVar()
 entry = tools.add_entry(tools.root, var)
-tools.place_items([entry], [200], [200], [150], [20])
+def show():
+    print(var.get())
+button = tools.add_button(tools.root, 'Test', show)
+tools.place_items([entry, button], [200, 400], [200, 200], [150, 50], [20, 50])
 tools.loop()
