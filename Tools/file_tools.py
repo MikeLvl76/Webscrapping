@@ -15,6 +15,8 @@ class File_Manager:
     def __init__(self) -> None:
         self.file_path = ''
 
+    # find file by giving current directory, filename and name of parent directory of the file
+    # if exists absolute path is saved, if not returns None
     def find_file(self, base, dirname, file):
         if not exists(base + sep + dirname + sep + file):
             return None
@@ -23,6 +25,9 @@ class File_Manager:
     def get_file_path(self):
         return self.file_path
 
+    # create file by giving its parent directory, name, extension and content
+    # if directory doesn't exist, it is created
+    # write the content in this file
     def create_file(self, dirname, file, extension, content):
         if not exists(dirname):
             mkdir(dirname)
@@ -31,6 +36,9 @@ class File_Manager:
             writer.write(content)
         print(f"File created at path : {self.file_path}")
 
+    # append file, useful for csv file due to pandas option
+    # if pandas is True then content is added next to the last column
+    # content argument is a dict but do not type {'keys': 'value'} but key=value for a good behavior
     def append_file(self, filepath, pandas=False, **content):
         if not filepath:
             raise FileException('wrong path given')
@@ -46,6 +54,9 @@ class File_Manager:
         df.to_csv(self.file_path)
         print(f"File appended at path : {self.file_path}")
 
+    # read file from given filepath
+    # if pandas is True, function is able to accept many columns of csv file as possible
+    # if pandas is False, classic file opening occurs and lines are returned
     def read_file(self, filepath, *cols, pandas=False):
         if not filepath:
             raise FileException('wrong path given')
@@ -55,8 +66,3 @@ class File_Manager:
             with open(filepath, 'r') as reader:
                 return reader.readlines()
         return pd.read_csv(self.file_path).loc[:,cols] if len(cols) > 0 else pd.read_csv(self.file_path)
-
-manager = File_Manager()
-manager.find_file(getcwd(), 'results', 'election.csv')
-manager.append_file(manager.get_file_path(), True, test=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
-print(manager.read_file(manager.get_file_path(), 'candidats', 'partis', pandas=True))
