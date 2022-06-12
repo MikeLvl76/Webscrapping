@@ -31,14 +31,19 @@ class File_Manager:
             writer.write(content)
         print(f"File created at path : {self.file_path}")
 
-    def append_file(self, filepath, content = "<default_append>"):
+    def append_file(self, filepath, pandas=False, **content):
         if not filepath:
             raise FileException('wrong path given')
         
-        with open(filepath, 'a') as editor:
-            if content is None:
-                raise ValueError('no content to add in file')
-            editor.write(content)
+        if not pandas:
+            with open(filepath, 'a') as editor:
+                editor.write(content)
+        df = self.read_file(filepath, pandas=True)
+        print(df)
+        for keys, values in content.items():
+            print(values)
+            df[keys] = values
+        df.to_csv(self.file_path)
         print(f"File appended at path : {self.file_path}")
 
     def read_file(self, filepath, *cols, pandas=False):
@@ -49,8 +54,9 @@ class File_Manager:
         if not pandas:
             with open(filepath, 'r') as reader:
                 return reader.readlines()
-        return pd.read_csv(self.file_path).loc[:,cols]
+        return pd.read_csv(self.file_path).loc[:,cols] if len(cols) > 0 else pd.read_csv(self.file_path)
 
 manager = File_Manager()
 manager.find_file(getcwd(), 'results', 'election.csv')
+manager.append_file(manager.get_file_path(), True, test=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 print(manager.read_file(manager.get_file_path(), 'candidats', 'partis', pandas=True))
