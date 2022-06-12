@@ -13,13 +13,11 @@ class Tools:
         if len(dimensions) == 2:
             width = dimensions[0]
             height = dimensions[1]
-            self.dimensions = (width, height)
-            self.root.geometry('x'.join((str(width), str(height))))
         else:
             width = self.root.winfo_screenwidth()
             height = self.root.winfo_screenheight()
-            self.dimensions = (width, height)
-            self.root.geometry('x'.join((str(width), str(height))))
+        self.dimensions = (width, height)
+        self.root.geometry('x'.join((str(width), str(height))))
     
     def create_canvas(self, master, dimensions = (), **args):
         canvas = None
