@@ -1,7 +1,7 @@
 from random import randint
 from bs4 import BeautifulSoup as soup
 from urllib.request import urlopen
-import os
+import os, re
 import time
 import pandas as pd
 from selenium import webdriver
@@ -122,11 +122,10 @@ class Scrapping:
         if isinstance(the_tag, (list, tuple)):
             tags = []
             for p_tag in the_tag:
-                tags.append(p_tag.getText().replace(
-                    "\n", "").replace(r"[(\d)]", ""))
+                tags.append(re.sub('\[(.*?)\]', "", p_tag.getText().replace("\n", "")))
             return tags
         else:
-            return the_tag.getText().replace("\n", "").replace(r"[(\d)]", "")
+            return re.sub('\[(.*?)\]',  "", the_tag.getText().replace("\n", ""))
 
     def get_one(self, tag, by_index = None, by_string = None, by_number = None):
         assert tag is not None, "TypeError: tag is a None type."

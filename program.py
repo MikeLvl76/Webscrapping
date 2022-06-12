@@ -2,7 +2,6 @@ import math
 from math import pi
 from Tools.web_tools import Scrapping
 from Tools.file_tools import File_Manager
-import re
 from bokeh.plotting import figure, output_file, show
 from bokeh.models import Legend, LegendItem, LabelSet, ColumnDataSource
 from bokeh.transform import cumsum
@@ -39,7 +38,7 @@ def main():
     for row in rows:
         if len(row) != 0:
             for i in range(1, len(row)):
-                row[i] = re.sub('\[(.*?)\]', '', scrapping.tag_text(row[i]))
+                row[i] = scrapping.tag_text(row[i])
                 if row[i].find(',') != -1:
                     row[i] = row[i].replace(',', '.')
             lines.append(row[1:])
