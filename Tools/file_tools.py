@@ -1,5 +1,6 @@
-from os import sep, mkdir
-from os.path import exists
+from os import getcwd, sep, mkdir
+from os.path import exists, abspath
+import pandas as pd
 
 # raised when unexpected behavior occurs
 class FileException(Exception):
@@ -13,6 +14,11 @@ class File_Manager:
 
     def __init__(self) -> None:
         self.file_path = ''
+
+    def find_file(self, base, dirname, file):
+        if not exists(base + sep + dirname + sep + file):
+            return None
+        self.file_path = abspath(base + sep + dirname + sep + file)
 
     def get_file_path(self):
         return self.file_path
@@ -35,10 +41,16 @@ class File_Manager:
             editor.write(content)
         print(f"File appended at path : {self.file_path}")
 
-    def read_file(self, filepath):
+    def read_file(self, filepath, *cols, pandas=False):
         if not filepath:
             raise FileException('wrong path given')
 
         print(f"Reading file at path : {self.file_path}...")
-        with open(filepath, 'r') as reader:
-            return reader.readlines()
+        if not pandas:
+            with open(filepath, 'r') as reader:
+                return reader.readlines()
+        return pd.read_csv(self.file_path).loc[:,cols]
+
+manager = File_Manager()
+manager.find_file(getcwd(), 'results', 'election.csv')
+print(manager.read_file(manager.get_file_path(), 'candidats', 'partis', pandas=True))
