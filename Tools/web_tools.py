@@ -58,10 +58,9 @@ class Scrapping:
         save data in .csv file
     """
 
-    def __init__(self, selenium=False):
+    def __init__(self):
         self.url = ""
         self.page = None
-        self.enable_selenium = selenium
         self.options = None
         self.driver = None
         self.action = None
@@ -76,18 +75,25 @@ class Scrapping:
     def save_page(self, reading):
         self.page = soup(reading, 'html.parser')
 
-    def take_tag(self, tag, attrs=list or tuple or None):
+    def get_page(self):
+        return self.page
+
+    def take_tag(self, tag = None, attrs=list or tuple or None):
+        if tag is None:
+            return self.page.find()
         res = self.page.find(tag, attrs)
         if tag == "a":
             res = self.page.find(tag, attrs, href=True)
             return res['href']
         return res
 
-    def take_tags(self, tag, attrs=list or tuple or None):
-        res = self.page.findAll(tag, attrs)
+    def take_tags(self, tag = None, attrs=list or tuple or None):
+        if tag is None:
+            return self.page.find_all()
+        res = self.page.find_all(tag, attrs)
         if tag == "a":
             href = []
-            res = self.page.findAll(tag, attrs, href=True)
+            res = self.page.find_all(tag, attrs, href=True)
             for r in res:
                 href.append(r['href'])
             return href
@@ -112,10 +118,10 @@ class Scrapping:
         if isinstance(parent_tag, (list, tuple)):
             tags = []
             for p_tag in parent_tag:
-                tags.append(p_tag.findAll(child_tag, recursive=False))
+                tags.append(p_tag.find_all(child_tag, recursive=False))
             return tags
         else:
-            return parent_tag.findAll(child_tag, recursive=False)
+            return parent_tag.find_all(child_tag, recursive=False)
 
     def tag_text(self, the_tag):
         assert the_tag is not None, "TypeError: tag is a None type."
@@ -143,18 +149,6 @@ class Scrapping:
                     return elt
         return None
 
-    def load_selenium(self, detach=False, headless=False):
-        if self.enable_selenium is True:
-            self.options = webdriver.ChromeOptions()
-            if detach is True: self.options.add_experimental_option(
-                "detach", detach)
-            if headless is True: self.options.add_argument("--headless")
-            # take browser driver version matching current browser version
-            service = Service(ChromeDriverManager().install())
-            self.driver = webdriver.Chrome(
-                service=service, options=self.options)
-            self.action = ActionChains(self.driver)
-
     def change(self, tool='\0', new_driver=None, new_options=None, new_action=None):
         if(tool == 'driver'):
             if(new_driver is not None):
@@ -170,6 +164,20 @@ class Scrapping:
                 print("[INFO] : new action set.")
         else:
             print("[INFO] : no change done.")
+
+class SeleniumController:
+
+    def __init__(self, detach=False, headless=False):
+        self.options = webdriver.ChromeOptions()
+        if detach is True: self.options.add_experimental_option(
+            "detach", detach)
+        if headless is True: self.options.add_argument("--headless")
+        self.options.add_argument("--remote-debugging-port=9225")
+        # take browser driver version matching current browser version
+        service = Service(ChromeDriverManager().install())
+        self.driver = webdriver.Chrome(
+            service=service, options=self.options)
+        self.action = ActionChains(self.driver)
 
     def get_driver(self):
         return self.driver
@@ -253,10 +261,27 @@ class Scrapping:
 
     def __str__(self):
         display = "--- Status ---\n"
-        if not self.url: display += "[INFO] no url found with urlopen\n"
-        else: display += "[INFO] url = {}\n".format(self.url)
-        if self.enable_selenium is False:
-            display += "[INFO] selenium not used"
-        else:
-            display += f"[INFO] url found by Selenium : {self.driver.current_url}"
+        display += f"[INFO] url found by Selenium : {self.driver.current_url}"
         return display
+
+class HTMLParser:
+
+    def __init__(self, controller) -> None:
+        self.controller = controller
+
+    def list_tags(self):
+        return [tag.name for tag in self.controller.take_tags()]
+
+    def list_unique_tags(self):
+        tags = {}
+        fetch = self.list_tags()
+        for tag in fetch:
+            if tag not in tags:
+                tags[tag.upper()] = tag
+        return tags
+
+scrapper = Scrapping()
+url = scrapper.open_url("https://fr.wikipedia.org/wiki/%C3%89lection_pr%C3%A9sidentielle_fran%C3%A7aise_de_2022")
+scrapper.save_page(url)
+parser = HTMLParser(scrapper)
+print(parser.list_unique_tags())
