@@ -1,4 +1,4 @@
-from tkinter import Button, Canvas, Entry, Tk
+from tkinter import Button, Canvas, Entry, Label, Tk
 import tkinter
 
 class Tools:
@@ -28,6 +28,9 @@ class Tools:
         canvas.pack()
         return canvas
 
+    def add_stringvar(self):
+        return tkinter.StringVar()
+
     def add_entry(self, master, string_var, **args):
         entry = Entry(master, textvariable=string_var, **args)
         entry.pack()
@@ -37,6 +40,11 @@ class Tools:
         button = Button(master, text=text, command=command, **args)
         button.pack()
         return button
+
+    def add_label(self, master, text, **args):
+        label = Label(master, text=text, **args)
+        label.pack()
+        return label
 
     def place_items(self, items, x_serie, y_serie, w_serie, h_serie):
         for item, x, y, w, h in zip(items, x_serie, y_serie, w_serie, h_serie):
@@ -48,7 +56,7 @@ class Tools:
 tools = Tools()
 tools.create_window('Test')
 canvas = tools.create_canvas(tools.root, (), background='red')
-var = tkinter.StringVar()
+var = tools.add_stringvar()
 entry = tools.add_entry(tools.root, var)
 def show():
     print(var.get())
