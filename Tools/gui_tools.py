@@ -56,6 +56,12 @@ class Tools:
         for item, x, y, w, h in zip(items, x_serie, y_serie, w_serie, h_serie):
             item.place(x=x, y=y, width=w, height=h)
 
+    def bind(self, item, type, callback):
+        item.bind(type, callback)
+
+    def change_state(self, item, state):
+        item['state'] = state
+
     def loop(self):
         self.root.mainloop()
 
@@ -66,7 +72,11 @@ var = tools.add_stringvar()
 entry = tools.add_entry(tools.root, var)
 def show():
     print(var.get())
+def test(event):
+    print('New element selected')
 button = tools.add_button(tools.root, 'Test', show)
 combobox = tools.add_combobox(tools.root, [str(i) for i in range(10)])
-tools.place_items([entry, button, combobox], [200, 400, 300], [200, 200, 500], [150, 50, 10], [20, 50, 10])
+tools.place_items([entry, button, combobox], [200, 400, 300], [200, 200, 500], [150, 50, 30], [20, 50, 20])
+tools.bind(combobox, "<<ComboboxSelected>>", test)
+tools.change_state(button, 'disabled')
 tools.loop()
