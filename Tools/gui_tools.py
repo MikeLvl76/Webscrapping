@@ -1,5 +1,6 @@
 from tkinter import Button, Canvas, Entry, Label, Tk
 import tkinter
+from tkinter.ttk import Combobox
 
 class Tools:
 
@@ -46,6 +47,11 @@ class Tools:
         label.pack()
         return label
 
+    def add_combobox(self, master, values = [], **args):
+        combobox = Combobox(master, values=values, **args)
+        combobox.pack()
+        return combobox
+
     def place_items(self, items, x_serie, y_serie, w_serie, h_serie):
         for item, x, y, w, h in zip(items, x_serie, y_serie, w_serie, h_serie):
             item.place(x=x, y=y, width=w, height=h)
@@ -61,5 +67,6 @@ entry = tools.add_entry(tools.root, var)
 def show():
     print(var.get())
 button = tools.add_button(tools.root, 'Test', show)
-tools.place_items([entry, button], [200, 400], [200, 200], [150, 50], [20, 50])
+combobox = tools.add_combobox(tools.root, [str(i) for i in range(10)])
+tools.place_items([entry, button, combobox], [200, 400, 300], [200, 200, 500], [150, 50, 10], [20, 50, 10])
 tools.loop()
