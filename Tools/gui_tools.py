@@ -51,6 +51,12 @@ class Tools:
         combobox = Combobox(master, values=values, **args)
         combobox.pack()
         return combobox
+    
+    # use this
+    def place(self, arg={}):
+        for key in arg.keys():
+            value = arg[key]
+            value[0].place(x=value[1], y=value[2], width=value[3], height=value[4])
 
     def place_items(self, items, x_serie, y_serie, w_serie, h_serie):
         for item, x, y, w, h in zip(items, x_serie, y_serie, w_serie, h_serie):
